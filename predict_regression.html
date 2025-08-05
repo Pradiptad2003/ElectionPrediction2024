@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Election Prediction using Regression</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Election Prediction using Regression</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('predict_regression') }}">Regression Prediction</a>
+            <a href="{{ url_for('predict_sentiment') }}">Sentiment Analysis</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Upload Dataset</h2>
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+            <form action="{{ url_for('predict_regression') }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".csv" required>
+                <button type="submit">Predict</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

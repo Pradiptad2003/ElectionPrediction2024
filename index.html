@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Electoral Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Electoral Prediction</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('predict_regression') }}">Election Prediction using Regression</a>
+            <a href="{{ url_for('predict_sentiment') }}">Election Prediction using Sentiment Analysis</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Welcome to the Electoral Prediction Tool</h2>
+            <p>Predict election outcomes with regression and sentiment analysis models. Upload data to get insights.</p>
+        </section>
+    </main>
+</body>
+</html>

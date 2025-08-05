@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Prediction Result</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('predict_regression') }}">Regression Prediction</a>
+            <a href="{{ url_for('predict_sentiment') }}">Sentiment Analysis</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Results</h2>
+            {% if prediction_image %}
+                <img src="data:image/png;base64,{{ prediction_image }}" alt="Regression Plot">
+            {% endif %}
+            {% if predictions %}
+                <h3>Prediction Values</h3>
+                <ul>
+                    {% for pred in predictions %}
+                        <li>{{ pred }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if sentiments %}
+                <h3>Sentiment Scores</h3>
+                <ul>
+                    {% for sentiment in sentiments %}
+                        <li>{{ sentiment }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

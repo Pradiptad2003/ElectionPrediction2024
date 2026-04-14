@@ -2,31 +2,27 @@ from flask import Flask, render_template, request
 import os
 import pandas as pd
 import base64
+import matplotlib
+matplotlib.use('Agg')  # IMPORTANT for EC2 (headless server)
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import pearsonr
 from mlp_regression import predict_with_mlp
 
-#  Headless server issue (EC2)
-import matplotlib
-matplotlib.use('Agg')
-
 app = Flask(__name__)
 
-# Upload folder
+# Upload folder setup
 app.config['UPLOAD_FOLDER'] = 'uploads'
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  # FIX: folder issue
 
-# create uploads folder if not exists
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-
-# Home route
+# ---------------- HOME ----------------
 @app.route('/')
 def index():
     return render_template('index.html')
 
 
-# Regression route
+# ---------------- REGRESSION ----------------
 @app.route('/predict_regression', methods=['GET', 'POST'])
 def predict_regression():
     if request.method == 'POST':
@@ -54,7 +50,7 @@ def predict_regression():
     return render_template('predict_regression.html')
 
 
-# Sentiment route
+# ---------------- SENTIMENT ----------------
 @app.route('/predict_sentiment', methods=['GET', 'POST'])
 def predict_sentiment():
     if request.method == 'POST':
@@ -71,32 +67,33 @@ def predict_sentiment():
 
             return render_template(
                 'prediction_result.html',
-                prediction_image=img_data,
-                r_value=r_value,
-                p_value=p_value,
-                result=hypothesis_result
+                prediction_image=img_data
             )
 
     return render_template('predict_sentiment.html')
 
 
-# Sentiment analysis function
+# ---------------- SENTIMENT FUNCTION ----------------
 def sentiment_analysis(data_path):
     data = pd.read_csv(data_path)
 
     sentiment_scores = data['Sentiment Score']
 
-    # column name corrected (removed extra space)
+    # FIX: removed extra space in column name
     vote_shares = data['Vote']
 
-    parties = data['Party']
-
+    # Scatter plot
     plt.figure(figsize=(8, 6))
+    plt.scatter(
+        sentiment_scores,
+        vote_shares,
+        s=100,
+        edgecolors='black'
+    )
 
-    plt.scatter(sentiment_scores, vote_shares, s=100, edgecolors='black')
-
-    for sentiment, vote, party in zip(sentiment_scores, vote_shares, parties):
-        plt.text(sentiment, vote, party, fontsize=10)
+    # Party labels
+    for sentiment, vote, party in zip(sentiment_scores, vote_shares, data['Party']):
+        plt.text(sentiment + 0.5, vote, party, fontsize=10)
 
     # Trend line
     m, b = np.polyfit(sentiment_scores, vote_shares, 1)
@@ -117,6 +114,7 @@ def sentiment_analysis(data_path):
     plt.title("Sentiment vs Vote Share")
     plt.grid(True)
 
+    # Save plot
     plot_path = os.path.join(app.config['UPLOAD_FOLDER'], 'sentiment_plot.png')
     plt.savefig(plot_path)
     plt.close()
@@ -124,6 +122,6 @@ def sentiment_analysis(data_path):
     return plot_path, round(r_value, 4), round(p_value, 4), hypothesis_result
 
 
-# Run app
+# ---------------- RUN APP ----------------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
